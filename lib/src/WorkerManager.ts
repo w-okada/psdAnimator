@@ -8,12 +8,14 @@ import { BlockingQueue } from "./utils/BlockingQueue";
 import { PSDAnimator } from "./PSDAnimator";
 
 
-export const generateConfig = (psdFile: ArrayBuffer, canvas: HTMLCanvasElement, onLocal = false) => {
+export const generateConfig = (psdFile: ArrayBuffer, canvas: HTMLCanvasElement, maxWidth: number, maxHeight: number, onLocal = false) => {
     const config: Config = {
         browserType: getBrowserType(),
         onLocal: onLocal,
         psdFile: psdFile,
-        canvas: canvas
+        canvas: canvas,
+        maxWidth: maxWidth,
+        maxHeight: maxHeight
     }
     return config
 }
@@ -46,7 +48,7 @@ export class WorkerManager {
 
         if (config.browserType == "SAFARI" || config.onLocal == true) {
             console.log("[PSD Animator] WORK ON Local")
-            this.animator = new PSDAnimator(config.psdFile, config.canvas)
+            this.animator = new PSDAnimator(config.psdFile, config.canvas, config.maxWidth, config.maxHeight)
         } else {
             const newWorker: Worker = workerJs();
             const p = new Promise<void>((resolve, reject) => {

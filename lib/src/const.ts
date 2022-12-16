@@ -31,6 +31,8 @@ export interface Config {
     onLocal: boolean
     psdFile: ArrayBuffer
     canvas: OffscreenCanvas | HTMLCanvasElement
+    maxWidth: number
+    maxHeight: number
 }
 
 export interface OperationParams {

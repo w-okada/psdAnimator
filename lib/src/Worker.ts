@@ -15,7 +15,7 @@ const responseError = (errorMessage: string) => {
 onmessage = async (event) => {
     if (event.data.message === WorkerCommand.INITIALIZE) {
         config = event.data.config as Config;
-        animator = new PSDAnimator(config.psdFile, config.canvas)
+        animator = new PSDAnimator(config.psdFile, config.canvas, config.maxWidth, config.maxHeight)
         ctx.postMessage({ message: WorkerResponse.INITIALIZED });
     } else if (event.data.message === WorkerCommand.EXECUTE) {
         const params: OperationParams = event.data.params;

@@ -7,6 +7,7 @@ export class PSDAnimator {
     canvas: OffscreenCanvas | HTMLCanvasElement
     psdFile: ArrayBuffer
     parts: { [key: string]: Layer }
+    ratio: number
     width: number
     height: number
 
@@ -17,13 +18,20 @@ export class PSDAnimator {
     waitRate = 1.0
     started = false
 
-    constructor(psdFile: ArrayBuffer, canvas: OffscreenCanvas | HTMLCanvasElement) {
+    imageCache: { [path: string]: OffscreenCanvas | HTMLCanvasElement } = {}
+
+    constructor(psdFile: ArrayBuffer, canvas: OffscreenCanvas | HTMLCanvasElement, maxWidth: number, maxHeight: number) {
         this.canvas = canvas
         this.psdFile = psdFile
         const psd = Psd.parse(this.psdFile);
         this.parts = this._parsePsdFile(psd)
-        this.width = psd.width
-        this.height = psd.height
+
+        const ratioW = maxWidth / psd.width
+        const ratioH = maxHeight / psd.height
+        this.ratio = Math.min(ratioW, ratioH)
+
+        this.width = psd.width * this.ratio
+        this.height = psd.height * this.ratio
         this.canvas.width = this.width
         this.canvas.height = this.height
 
@@ -101,29 +109,37 @@ export class PSDAnimator {
                     const index = this.animationCounter % layerList.length
                     const drawingLayerPath = layerList[index]
                     const drawingLayer = this.parts[drawingLayerPath]
-                    const buf = await drawingLayer.composite()
 
-                    const imageData = new ImageData(
-                        buf,
-                        drawingLayer.width,
-                        drawingLayer.height
-                    );
+                    if (!this.imageCache[drawingLayerPath]) {
+                        const buf = await drawingLayer.composite()
 
-                    let tmpCanvas: OffscreenCanvas | HTMLCanvasElement | null = null
-                    if (this.canvas instanceof OffscreenCanvas) {
-                        tmpCanvas = new OffscreenCanvas(drawingLayer.width, drawingLayer.height)
+                        const imageData = new ImageData(
+                            buf,
+                            drawingLayer.width,
+                            drawingLayer.height
+                        );
 
-                    } else {
-                        tmpCanvas = document.createElement("canvas")
-                        tmpCanvas.width = drawingLayer.width
-                        tmpCanvas.height = drawingLayer.height
+                        let tmpCanvas: OffscreenCanvas | HTMLCanvasElement | null = null
+                        let resizedTmpCanvas: OffscreenCanvas | HTMLCanvasElement | null = null
+                        if (this.canvas instanceof OffscreenCanvas) {
+                            tmpCanvas = new OffscreenCanvas(drawingLayer.width, drawingLayer.height)
+                            resizedTmpCanvas = new OffscreenCanvas(drawingLayer.width * this.ratio, drawingLayer.height * this.ratio)
+                        } else {
+                            tmpCanvas = document.createElement("canvas")
+                            tmpCanvas.width = drawingLayer.width
+                            tmpCanvas.height = drawingLayer.height
+                            resizedTmpCanvas = document.createElement("canvas")
+                            resizedTmpCanvas.width = drawingLayer.width * this.ratio
+                            resizedTmpCanvas.height = drawingLayer.height * this.ratio
+                        }
+                        // @ts-ignore
+                        tmpCanvas.getContext("2d")!.putImageData(imageData, 0, 0)
+                        resizedTmpCanvas.getContext("2d")!.drawImage(tmpCanvas, 0, 0, resizedTmpCanvas.width, resizedTmpCanvas.height)
+                        this.imageCache[drawingLayerPath] = resizedTmpCanvas
                     }
 
-                    // @ts-ignore
-                    tmpCanvas.getContext("2d")!.putImageData(imageData, 0, 0)
-
-                    // @ts-ignore
-                    ctx.drawImage(tmpCanvas, drawingLayer.left, drawingLayer.top, drawingLayer.width, drawingLayer.height)
+                    const tmpCanvas = this.imageCache[drawingLayerPath]
+                    ctx.drawImage(tmpCanvas, drawingLayer.left * this.ratio, drawingLayer.top * this.ratio, tmpCanvas.width, tmpCanvas.height)
                 }
             }
             if (this.started) {
