@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo } from "react";
 import { createRoot } from "react-dom/client";
-import { OperationParams, WorkerManager, generateConfig } from "psdanimator"
+import { generateConfig, OperationParams, WorkerManager } from "@dannadori/psdanimator";
+
 import "./index.css"
 
 const App = () => {
@@ -11,7 +12,8 @@ const App = () => {
     const loadPsd = async () => {
         const psdFile = await (await fetch("./zundamonB.psd")).arrayBuffer()
         const canvas = document.getElementById("test-canvas1") as HTMLCanvasElement
-        const c = generateConfig(psdFile, canvas, true)
+        const c = generateConfig(psdFile, canvas, 640, 480, true)
+        // const c = generateConfig(psdFile, canvas, 640, 480, false)
 
 
         await w.init(c)
@@ -56,8 +58,8 @@ const App = () => {
 
                 { "mode": "talking", "z_index": 1, "number": 1, "layer_path": "ROOT_体_1" },
 
-                { "mode": "talking", "z_index": 2, "number": 2, "layer_path": "ROOT_表情_眉_1" },
-                { "mode": "talking", "z_index": 2, "number": 2, "layer_path": "ROOT_表情_眉_2" },
+                { "mode": "talking", "z_index": 2, "number": 1, "layer_path": "ROOT_表情_眉_1" },
+                { "mode": "talking", "z_index": 2, "number": 1, "layer_path": "ROOT_表情_眉_2" },
 
                 { "mode": "talking", "z_index": 3, "number": 2, "layer_path": "ROOT_表情_口_7" },
                 { "mode": "talking", "z_index": 3, "number": 2, "layer_path": "ROOT_表情_口_2" },
@@ -112,7 +114,7 @@ const App = () => {
     const speedUp = async () => {
         const p3: OperationParams = {
             type: "SET_WAIT_RATE",
-            waitRate: 0.5
+            waitRate: 0.001
         }
         await w.execute(p3)
         console.log("start wait rate")
@@ -122,7 +124,7 @@ const App = () => {
     const speedDown = async () => {
         const p3: OperationParams = {
             type: "SET_WAIT_RATE",
-            waitRate: 1.5
+            waitRate: 4
         }
         await w.execute(p3)
         console.log("start wait rate")
@@ -147,14 +149,12 @@ const App = () => {
 
     useEffect(() => {
         const draw = async () => {
-            console.log("draw")
             const canvas1 = document.getElementById("test-canvas1") as HTMLCanvasElement
             const canvas2 = document.getElementById("test-canvas2") as HTMLCanvasElement
             const ctx = canvas2.getContext("2d")!
             ctx.clearRect(0, 0, canvas2.width, canvas2.height)
             ctx.drawImage(canvas1, 0, 0, canvas2.width, canvas2.height)
             requestAnimationFrame(draw)
-            // setTimeout(draw, 100)
         }
         draw()
     }, [])

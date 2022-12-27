@@ -3,7 +3,7 @@ import { getBrowserType } from "./utils/BrowserUtil";
 
 
 // @ts-ignore
-import workerJs from "worker-loader?inline=no-fallback!./Worker.ts";
+import workerJs from "worker-loader?inline=no-fallback!./Worker.js";
 import { BlockingQueue } from "./utils/BlockingQueue";
 import { PSDAnimator } from "./PSDAnimator";
 
