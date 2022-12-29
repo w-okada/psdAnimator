@@ -15,13 +15,13 @@ const App = () => {
         // const c = generateConfig(psdFile, canvas, 640, 480, true)
         const c = generateConfig(psdFile, canvas, 640, 480, false)
         c.transfer = [c.canvas]
-        c.processorURL = `${window.location.origin}/js/index.js`
-
+        // c.processorURL = `${window.location.origin}/process.js`
 
         await w.init(c)
         console.log("Initialized")
     }
     const setMotion = async () => {
+        // @ts-ignore
         const p1: PSDAnimatorParams = {
             type: "SET_MOTION",
             motion: [
@@ -81,6 +81,7 @@ const App = () => {
     }
 
     const setMotionMode1 = async () => {
+        // @ts-ignore
         const p2: PSDAnimatorParams = {
             type: "SWITCH_MOTION_MODE",
             motionMode: "normal",
@@ -91,13 +92,18 @@ const App = () => {
 
     }
     const getLayerPaths = async () => {
+        // @ts-ignore
+
         const p2: PSDAnimatorParams = {
             type: "GET_LAYER_PATHS",
             transfer: []
         }
+        // @ts-ignore
+
         const layers = await w.execute(p2) as PSDAnimatorResult
         console.log("LAYERS", layers)
 
+        // @ts-ignore
         const p1: PSDAnimatorParams = {
             type: "SET_MOTION",
             motion: [
@@ -111,14 +117,23 @@ const App = () => {
     }
 
     const start = async () => {
+        // @ts-ignore
+
         const p3: PSDAnimatorParams = {
             type: "START",
             transfer: []
         }
         await w.execute(p3)
         console.log("start motion")
+
+        const canvas1 = document.getElementById("test-canvas1") as HTMLCanvasElement
+        const video = document.getElementById("test-video") as HTMLVideoElement
+        video.srcObject = canvas1.captureStream()
+        video.play()
     }
     const stop = async () => {
+        // @ts-ignore
+
         const p3: PSDAnimatorParams = {
             type: "STOP",
             transfer: []
@@ -128,6 +143,8 @@ const App = () => {
     }
 
     const speedUp = async () => {
+        // @ts-ignore
+
         const p3: PSDAnimatorParams = {
             type: "SET_WAIT_RATE",
             waitRate: 0.001,
@@ -139,6 +156,8 @@ const App = () => {
 
 
     const speedDown = async () => {
+        // @ts-ignore
+
         const p3: PSDAnimatorParams = {
             type: "SET_WAIT_RATE",
             waitRate: 4,
@@ -165,27 +184,27 @@ const App = () => {
         ctx.clearRect(0, 0, canvas2.width, canvas2.height)
     }
 
-    useEffect(() => {
-        const draw = async () => {
-            const canvas1 = document.getElementById("test-canvas1") as HTMLCanvasElement
+    // useEffect(() => {
+    //     const draw = async () => {
+    //         const canvas1 = document.getElementById("test-canvas1") as HTMLCanvasElement
 
-            ///// **** Stack updating the image, I dont knwo why. ****
-            // const canvas2 = document.getElementById("test-canvas2") as HTMLCanvasElement
-            // const ctx = canvas2.getContext("2d")!
-            // ctx.clearRect(0, 0, canvas2.width, canvas2.height)
-            // ctx.drawImage(canvas1, 0, 0, canvas2.width, canvas2.height)
-            // // requestAnimationFrame(draw)
-            // setTimeout(draw, 100)
+    //         ///// **** Stack updating the image, I dont knwo why. ****
+    //         // const canvas2 = document.getElementById("test-canvas2") as HTMLCanvasElement
+    //         // const ctx = canvas2.getContext("2d")!
+    //         // ctx.clearRect(0, 0, canvas2.width, canvas2.height)
+    //         // ctx.drawImage(canvas1, 0, 0, canvas2.width, canvas2.height)
+    //         // // requestAnimationFrame(draw)
+    //         // setTimeout(draw, 100)
 
-            ///// **** Capture stream is OK. ****
-            const video = document.getElementById("test-video") as HTMLVideoElement
-            video.srcObject = canvas1.captureStream()
-            video.play()
+    //         ///// **** Capture stream is OK. ****
+    //         const video = document.getElementById("test-video") as HTMLVideoElement
+    //         video.srcObject = canvas1.captureStream()
+    //         video.play()
 
 
-        }
-        draw()
-    }, [])
+    //     }
+    //     draw()
+    // }, [])
 
     return (
         <div className="root-div">

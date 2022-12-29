@@ -47,7 +47,7 @@ export const generateConfig = (psdFile: ArrayBuffer, canvas: HTMLCanvasElement, 
     const config: PSDAnimatorConfig = {
         browserType: getBrowserType(),
         onLocal: onLocal,
-        processorURL: "https://cdn.jsdelivr.net/npm/@dannadori/psdanimator/dist/index.js",
+        processorURL: "https://cdn.jsdelivr.net/npm/@dannadori/psdanimator/dist/process.js",
         processorName: "PSDAnimator",
         transfer: [],
         psdFile: psdFile,
