@@ -1,18 +1,4 @@
-import { BrowserTypes } from "./utils/BrowserUtil";
-
-export const WorkerCommand = {
-    INITIALIZE: "initialize",
-    EXECUTE: "execute",
-} as const;
-export type WorkerCommand = typeof WorkerCommand[keyof typeof WorkerCommand];
-
-export const WorkerResponse = {
-    INITIALIZED: "initialized",
-    EXECUTED: "EXECUTED",
-} as const;
-export type WorkerResponse = typeof WorkerResponse[keyof typeof WorkerResponse];
-
-
+import { getBrowserType, ProcessorConfig, ProcessorParams } from "@dannadori/worker-manager"
 
 export const FunctionTypes = {
     SET_MOTION: "SET_MOTION",
@@ -25,29 +11,40 @@ export const FunctionTypes = {
 export type FunctionTypes = typeof FunctionTypes[keyof typeof FunctionTypes];
 
 
+export type AnimationFrameInfo = {
+    "mode": string,
+    "z_index": number,
+    "number": number,
+    "layer_path": string
+}
 
-export interface Config {
-    browserType: BrowserTypes;
-    onLocal: boolean
+
+export type PSDAnimatorConfig = ProcessorConfig & {
     psdFile: ArrayBuffer
     canvas: OffscreenCanvas | HTMLCanvasElement
     maxWidth: number
     maxHeight: number
 }
 
-export interface OperationParams {
+export type PSDAnimatorParams = ProcessorParams & {
     type: FunctionTypes;
     motion?: AnimationFrameInfo[]
     waitRate?: number
     motionMode?: string
-
 }
 
 
-
-export type AnimationFrameInfo = {
-    "mode": string,
-    "z_index": number,
-    "number": number,
-    "layer_path": string
+export const generateConfig = (psdFile: ArrayBuffer, canvas: HTMLCanvasElement, maxWidth: number, maxHeight: number, onLocal = false) => {
+    const config: PSDAnimatorConfig = {
+        browserType: getBrowserType(),
+        onLocal: onLocal,
+        processorURL: "https://cdn.jsdelivr.net/npm/@dannadori/psdanimator/dist/index.js",
+        processorName: "PSDAnimator",
+        transfer: [],
+        psdFile: psdFile,
+        canvas: canvas,
+        maxWidth: maxWidth,
+        maxHeight: maxHeight
+    }
+    return config
 }

@@ -1,9 +1,10 @@
 
 import Psd, { Layer } from "@webtoon/psd";
 import { NodeBase } from "@webtoon/psd/dist/classes/NodeBase";
-import { AnimationFrameInfo } from "./const";
+import { AnimationFrameInfo, PSDAnimatorConfig, PSDAnimatorParams } from "./const";
+import { Processor, ProcessorConfig, ProcessorParams, ProcessorResult } from "@dannadori/worker-manager"
 
-export class PSDAnimator {
+export class PSDAnimator extends Processor {
     canvas: OffscreenCanvas | HTMLCanvasElement
     psdFile: ArrayBuffer
     parts: { [key: string]: Layer }
@@ -20,14 +21,39 @@ export class PSDAnimator {
 
     imageCache: { [path: string]: OffscreenCanvas | HTMLCanvasElement } = {}
 
-    constructor(psdFile: ArrayBuffer, canvas: OffscreenCanvas | HTMLCanvasElement, maxWidth: number, maxHeight: number) {
-        this.canvas = canvas
-        this.psdFile = psdFile
-        const psd = Psd.parse(this.psdFile);
-        this.parts = this._parsePsdFile(psd)
+    // constructor(psdFile: ArrayBuffer, canvas: OffscreenCanvas | HTMLCanvasElement, maxWidth: number, maxHeight: number) {
+    //     super()
+    //     this.canvas = canvas
+    //     this.psdFile = psdFile
+    //     const psd = Psd.parse(this.psdFile);
+    //     this.parts = this._parsePsdFile(psd)
 
-        const ratioW = maxWidth / psd.width
-        const ratioH = maxHeight / psd.height
+    //     const ratioW = maxWidth / psd.width
+    //     const ratioH = maxHeight / psd.height
+    //     this.ratio = Math.min(ratioW, ratioH)
+
+    //     this.width = psd.width * this.ratio
+    //     this.height = psd.height * this.ratio
+    //     this.canvas.width = this.width
+    //     this.canvas.height = this.height
+
+    // }
+
+    constructor(_config: ProcessorConfig) {
+        console.log("new!", _config)
+        super()
+        console.log("new1", _config)
+        const config = _config as PSDAnimatorConfig
+        this.canvas = config.canvas
+        this.psdFile = config.psdFile
+        console.log("new2", Psd)
+        const psd = Psd.parse(this.psdFile);
+        console.log("new2.5", psd)
+        this.parts = this._parsePsdFile(psd)
+        console.log("new3", _config)
+
+        const ratioW = config.maxWidth / psd.width
+        const ratioH = config.maxHeight / psd.height
         this.ratio = Math.min(ratioW, ratioH)
 
         this.width = psd.width * this.ratio
@@ -36,6 +62,7 @@ export class PSDAnimator {
         this.canvas.height = this.height
 
     }
+
 
     _generateLayerPath = (node: NodeBase, ancestors: string[]) => {
         ancestors.push(node.name)
@@ -133,12 +160,15 @@ export class PSDAnimator {
                             resizedTmpCanvas.height = drawingLayer.height * this.ratio
                         }
                         // @ts-ignore
-                        tmpCanvas.getContext("2d")!.putImageData(imageData, 0, 0)
+                        tmpCanvas.getContext("2d")!.putImageData(imageData, 0, 0);
+
+                        // @ts-ignore
                         resizedTmpCanvas.getContext("2d")!.drawImage(tmpCanvas, 0, 0, resizedTmpCanvas.width, resizedTmpCanvas.height)
                         this.imageCache[drawingLayerPath] = resizedTmpCanvas
                     }
 
                     const tmpCanvas = this.imageCache[drawingLayerPath]
+                    // @ts-ignore
                     ctx.drawImage(tmpCanvas, drawingLayer.left * this.ratio, drawingLayer.top * this.ratio, tmpCanvas.width, tmpCanvas.height)
                 }
             }
@@ -148,5 +178,15 @@ export class PSDAnimator {
         }
         requestAnimationFrame(draw)
     }
+
+    process = (_params: ProcessorParams) => {
+        const params = _params as PSDAnimatorParams
+        console.log(`PSDAnimatorParams:`, params)
+        const result: ProcessorResult = {
+            transfer: []
+        }
+        return result
+    };
+
 }
 

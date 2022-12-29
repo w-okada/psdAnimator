@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo } from "react";
 import { createRoot } from "react-dom/client";
-import { generateConfig, OperationParams, WorkerManager } from "@dannadori/psdanimator";
+import { generateConfig, PSDAnimatorParams, WorkerManager } from "@dannadori/psdanimator";
 
 import "./index.css"
 
@@ -12,15 +12,18 @@ const App = () => {
     const loadPsd = async () => {
         const psdFile = await (await fetch("./zundamonB.psd")).arrayBuffer()
         const canvas = document.getElementById("test-canvas1") as HTMLCanvasElement
-        const c = generateConfig(psdFile, canvas, 640, 480, true)
-        // const c = generateConfig(psdFile, canvas, 640, 480, false)
+        // const c = generateConfig(psdFile, canvas, 640, 480, true)
+        const c = generateConfig(psdFile, canvas, 640, 480, false)
+        c.transfer = [c.canvas]
+        console.log(window.location)
+        c.processorURL = `${window.location.origin}/a.js`
 
 
         await w.init(c)
         console.log("Initialized")
     }
     const setMotion = async () => {
-        const p1: OperationParams = {
+        const p1: PSDAnimatorParams = {
             type: "SET_MOTION",
             motion: [
                 { "mode": "normal", "z_index": 0, "number": 10, "layer_path": "ROOT_ポニテ？_2" },
@@ -70,7 +73,8 @@ const App = () => {
                 { "mode": "talking", "z_index": 4, "number": 30, "layer_path": "ROOT_表情_目_6" },
 
                 { "mode": "talking", "z_index": 5, "number": 5, "layer_path": "ROOT_耳_1" }
-            ]
+            ],
+            transfer: []
 
         }
         await w.execute(p1)
@@ -78,18 +82,20 @@ const App = () => {
     }
 
     const setMotionMode1 = async () => {
-        const p2: OperationParams = {
+        const p2: PSDAnimatorParams = {
             type: "SWITCH_MOTION_MODE",
             motionMode: "normal",
+            transfer: []
         }
         await w.execute(p2)
         console.log("set motion mode")
 
     }
     const setMotionMode2 = async () => {
-        const p2: OperationParams = {
+        const p2: PSDAnimatorParams = {
             type: "SWITCH_MOTION_MODE",
             motionMode: "talking",
+            transfer: []
         }
         await w.execute(p2)
         console.log("set motion mode")
@@ -97,24 +103,27 @@ const App = () => {
     }
 
     const start = async () => {
-        const p3: OperationParams = {
+        const p3: PSDAnimatorParams = {
             type: "START",
+            transfer: []
         }
         await w.execute(p3)
         console.log("start motion")
     }
     const stop = async () => {
-        const p3: OperationParams = {
+        const p3: PSDAnimatorParams = {
             type: "STOP",
+            transfer: []
         }
         await w.execute(p3)
         console.log("stop motion")
     }
 
     const speedUp = async () => {
-        const p3: OperationParams = {
+        const p3: PSDAnimatorParams = {
             type: "SET_WAIT_RATE",
-            waitRate: 0.001
+            waitRate: 0.001,
+            transfer: []
         }
         await w.execute(p3)
         console.log("start wait rate")
@@ -122,9 +131,10 @@ const App = () => {
 
 
     const speedDown = async () => {
-        const p3: OperationParams = {
+        const p3: PSDAnimatorParams = {
             type: "SET_WAIT_RATE",
-            waitRate: 4
+            waitRate: 4,
+            transfer: []
         }
         await w.execute(p3)
         console.log("start wait rate")
