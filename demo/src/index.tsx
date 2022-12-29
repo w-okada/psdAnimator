@@ -12,8 +12,8 @@ const App = () => {
     const loadPsd = async () => {
         const psdFile = await (await fetch("./zundamonB.psd")).arrayBuffer()
         const canvas = document.getElementById("test-canvas1") as HTMLCanvasElement
-        const c = generateConfig(psdFile, canvas, 640, 480, true)
-        // const c = generateConfig(psdFile, canvas, 640, 480, false)
+        // const c = generateConfig(psdFile, canvas, 640, 480, true)
+        const c = generateConfig(psdFile, canvas, 640, 480, false)
         c.transfer = [c.canvas]
         c.processorURL = `${window.location.origin}/js/index.js`
 
@@ -168,11 +168,21 @@ const App = () => {
     useEffect(() => {
         const draw = async () => {
             const canvas1 = document.getElementById("test-canvas1") as HTMLCanvasElement
-            const canvas2 = document.getElementById("test-canvas2") as HTMLCanvasElement
-            const ctx = canvas2.getContext("2d")!
-            ctx.clearRect(0, 0, canvas2.width, canvas2.height)
-            ctx.drawImage(canvas1, 0, 0, canvas2.width, canvas2.height)
-            requestAnimationFrame(draw)
+
+            ///// **** Stack updating the image, I dont knwo why. ****
+            // const canvas2 = document.getElementById("test-canvas2") as HTMLCanvasElement
+            // const ctx = canvas2.getContext("2d")!
+            // ctx.clearRect(0, 0, canvas2.width, canvas2.height)
+            // ctx.drawImage(canvas1, 0, 0, canvas2.width, canvas2.height)
+            // // requestAnimationFrame(draw)
+            // setTimeout(draw, 100)
+
+            ///// **** Capture stream is OK. ****
+            const video = document.getElementById("test-video") as HTMLVideoElement
+            video.srcObject = canvas1.captureStream()
+            video.play()
+
+
         }
         draw()
     }, [])
@@ -193,7 +203,8 @@ const App = () => {
             </div>
             <div className="body">
                 <canvas id="test-canvas1" className="left-canvas"></canvas>
-                <canvas id="test-canvas2" className="right-canvas"></canvas>
+                {/* <canvas id="test-canvas2" className="right-canvas"></canvas> */}
+                <video id="test-video" className="right-canvas"></video>
             </div>
         </div>
     )

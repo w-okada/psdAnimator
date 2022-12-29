@@ -150,6 +150,7 @@ export class PSDAnimator extends Processor {
                 }
             }
             if (this.started) {
+                // requestAnimationFrame(draw);
                 setTimeout(draw, this.wait * this.waitRate)
             }
         }
