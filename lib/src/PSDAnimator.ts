@@ -1,7 +1,7 @@
 
 import Psd, { Layer } from "@webtoon/psd";
 import { NodeBase } from "@webtoon/psd/dist/classes/NodeBase";
-import { AnimationFrameInfo, PSDAnimatorConfig, PSDAnimatorParams } from "./const";
+import { AnimationFrameInfo, PSDAnimatorConfig, PSDAnimatorParams, PSDAnimatorResult } from "./const";
 import { Processor, ProcessorConfig, ProcessorParams, ProcessorResult } from "@dannadori/worker-manager"
 
 export class PSDAnimator extends Processor {
@@ -21,36 +21,13 @@ export class PSDAnimator extends Processor {
 
     imageCache: { [path: string]: OffscreenCanvas | HTMLCanvasElement } = {}
 
-    // constructor(psdFile: ArrayBuffer, canvas: OffscreenCanvas | HTMLCanvasElement, maxWidth: number, maxHeight: number) {
-    //     super()
-    //     this.canvas = canvas
-    //     this.psdFile = psdFile
-    //     const psd = Psd.parse(this.psdFile);
-    //     this.parts = this._parsePsdFile(psd)
-
-    //     const ratioW = maxWidth / psd.width
-    //     const ratioH = maxHeight / psd.height
-    //     this.ratio = Math.min(ratioW, ratioH)
-
-    //     this.width = psd.width * this.ratio
-    //     this.height = psd.height * this.ratio
-    //     this.canvas.width = this.width
-    //     this.canvas.height = this.height
-
-    // }
-
     constructor(_config: ProcessorConfig) {
-        console.log("new!", _config)
         super()
-        console.log("new1", _config)
         const config = _config as PSDAnimatorConfig
         this.canvas = config.canvas
         this.psdFile = config.psdFile
-        console.log("new2", Psd)
         const psd = Psd.parse(this.psdFile);
-        console.log("new2.5", psd)
         this.parts = this._parsePsdFile(psd)
-        console.log("new3", _config)
 
         const ratioW = config.maxWidth / psd.width
         const ratioH = config.maxHeight / psd.height
@@ -179,13 +156,62 @@ export class PSDAnimator extends Processor {
         requestAnimationFrame(draw)
     }
 
-    process = (_params: ProcessorParams) => {
-        const params = _params as PSDAnimatorParams
-        console.log(`PSDAnimatorParams:`, params)
-        const result: ProcessorResult = {
+    getLayerPaths = () => {
+        return Object.keys(this.parts)
+    }
+
+
+    _errorResult = (detail: string): PSDAnimatorResult => {
+        return {
+            status: "failed",
+            detail: detail,
             transfer: []
         }
-        return result
+    }
+
+    process = (_params: ProcessorParams): PSDAnimatorResult => {
+        const params = _params as PSDAnimatorParams
+        // console.log(`PSDAnimatorParams:`, params)
+
+        switch (params.type) {
+            case "SET_MOTION":
+                if (!params.motion) {
+                    return this._errorResult(`No Motion Data.`)
+                }
+                this.setMotion(params.motion)
+                break
+            case "SET_WAIT_RATE":
+                if (!params.waitRate) {
+                    return this._errorResult(`No Wait Rate.`)
+                }
+                this.setWaitRate(params.waitRate)
+                break
+            case "START":
+                this.start()
+                break
+            case "STOP":
+                this.stop()
+                break
+            case "SWITCH_MOTION_MODE":
+                if (!params.motionMode) {
+                    return this._errorResult(`No Motion Mode.`)
+                }
+                this.switchMotionMode(params.motionMode)
+                break
+            case "GET_LAYER_PATHS":
+                return {
+                    status: "succeeded",
+                    layerPaths: this.getLayerPaths(),
+                    transfer: []
+                }
+            default:
+                return this._errorResult(`UNKNOWN FUNCTION: ${params.type}`)
+        }
+
+        return {
+            status: "succeeded",
+            transfer: []
+        }
     };
 
 }

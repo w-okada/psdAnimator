@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo } from "react";
 import { createRoot } from "react-dom/client";
-import { generateConfig, PSDAnimatorParams, WorkerManager } from "@dannadori/psdanimator";
+import { generateConfig, PSDAnimatorParams, PSDAnimatorResult, WorkerManager } from "@dannadori/psdanimator";
 
 import "./index.css"
 
@@ -12,11 +12,10 @@ const App = () => {
     const loadPsd = async () => {
         const psdFile = await (await fetch("./zundamonB.psd")).arrayBuffer()
         const canvas = document.getElementById("test-canvas1") as HTMLCanvasElement
-        // const c = generateConfig(psdFile, canvas, 640, 480, true)
-        const c = generateConfig(psdFile, canvas, 640, 480, false)
+        const c = generateConfig(psdFile, canvas, 640, 480, true)
+        // const c = generateConfig(psdFile, canvas, 640, 480, false)
         c.transfer = [c.canvas]
-        console.log(window.location)
-        c.processorURL = `${window.location.origin}/a.js`
+        c.processorURL = `${window.location.origin}/js/index.js`
 
 
         await w.init(c)
@@ -91,14 +90,23 @@ const App = () => {
         console.log("set motion mode")
 
     }
-    const setMotionMode2 = async () => {
+    const getLayerPaths = async () => {
         const p2: PSDAnimatorParams = {
-            type: "SWITCH_MOTION_MODE",
-            motionMode: "talking",
+            type: "GET_LAYER_PATHS",
             transfer: []
         }
-        await w.execute(p2)
-        console.log("set motion mode")
+        const layers = await w.execute(p2) as PSDAnimatorResult
+        console.log("LAYERS", layers)
+
+        const p1: PSDAnimatorParams = {
+            type: "SET_MOTION",
+            motion: [
+                { "mode": "normal", "z_index": 0, "number": 10, "layer_path": layers.layerPaths![0] },
+            ],
+            transfer: []
+
+        }
+        await w.execute(p1)
 
     }
 
@@ -175,13 +183,13 @@ const App = () => {
                 <div className="header-button" onClick={loadPsd}>load</div>
                 <div className="header-button" onClick={setMotion}>set motion</div>
                 <div className="header-button" onClick={setMotionMode1}>set mode1</div>
-                <div className="header-button" onClick={setMotionMode2}>set mode2</div>
+                <div className="header-button" onClick={getLayerPaths}>get paths</div>
                 <div className="header-button" onClick={start}>start</div>
                 <div className="header-button" onClick={stop}>stop</div>
                 <div className="header-button" onClick={speedUp}>speed_up</div>
                 <div className="header-button" onClick={speedDown}>speed_down</div>
-                <div className="header-button" onClick={forceDraw}>draw</div>
-                <div className="header-button" onClick={clear}>clear</div>
+                {/* <div className="header-button" onClick={forceDraw}>draw</div> */}
+                {/* <div className="header-button" onClick={clear}>clear</div> */}
             </div>
             <div className="body">
                 <canvas id="test-canvas1" className="left-canvas"></canvas>

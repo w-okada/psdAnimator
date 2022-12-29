@@ -1,6 +1,6 @@
 {
     "name": "@dannadori/psdanimator",
-    "version": "1.0.7",
+    "version": "1.0.9",
     "description": "",
     "main": "dist/index.js",
     "scripts": {
@@ -36,7 +36,7 @@
         "worker-loader": "^3.0.8"
     },
     "dependencies": {
-        "@dannadori/worker-manager": "^1.0.9",
+        "@dannadori/worker-manager": "^1.0.10",
         "@webtoon/psd": "^0.3.0"
     }
 }

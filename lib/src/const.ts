@@ -1,6 +1,7 @@
-import { getBrowserType, ProcessorConfig, ProcessorParams } from "@dannadori/worker-manager"
+import { getBrowserType, ProcessorConfig, ProcessorParams, ProcessorResult } from "@dannadori/worker-manager"
 
 export const FunctionTypes = {
+    GET_LAYER_PATHS: "GET_LAYER_PATHS",
     SET_MOTION: "SET_MOTION",
     SWITCH_MOTION_MODE: "SWITCH_MOTION_MODE",
     SET_WAIT_RATE: "SET_WAIT_RATE",
@@ -34,6 +35,14 @@ export type PSDAnimatorParams = ProcessorParams & {
 }
 
 
+export type PSDAnimatorResult = ProcessorResult & {
+    status: string,
+    detail?: string
+    layerPaths?: string[]
+}
+
+
+
 export const generateConfig = (psdFile: ArrayBuffer, canvas: HTMLCanvasElement, maxWidth: number, maxHeight: number, onLocal = false) => {
     const config: PSDAnimatorConfig = {
         browserType: getBrowserType(),
@@ -46,5 +55,6 @@ export const generateConfig = (psdFile: ArrayBuffer, canvas: HTMLCanvasElement, 
         maxWidth: maxWidth,
         maxHeight: maxHeight
     }
+    config.transfer.push(config.canvas)
     return config
 }
