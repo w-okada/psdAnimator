@@ -1,40 +1,133 @@
-.root-div{
-    width:100%;
-    height:100%;
+.root-div {
+    width: 100%;
+    height: 100%;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     background: #ddd;
 }
-.header{
-    width:100%;
-    height:20%;
+.control-area {
+    width: 20rem;
+    height: 100%;
+    background: #eef;
+    .control-container {
+        margin: 1rem;
+        width: 100%;
+        .body-button-container {
+            display: flex;
+            flex-direction: row;
+            .body-item-title {
+            }
+            .body-button {
+                border: solid 2px;
+                background: #fff;
+                padding: 2px;
+            }
+        }
+    }
+}
+.psd-canvas {
+    width: calc(100% - 20rem);
+    height: 100%;
+    background: #eff;
+}
+
+.split-3-5-2 {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    margin: 1px 0px 1px 0px;
+    & > div:nth-child(1) {
+        left: 0px;
+        width: 30%;
+    }
+    & > div:nth-child(2) {
+        left: 30%;
+        width: 50%;
+    }
+    & > div:nth-child(3) {
+        left: 80%;
+        width: 20%;
+    }
+}
+
+.split-3-4-3 {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    margin: 1px 0px 1px 0px;
+    & > div:nth-child(1) {
+        left: 0px;
+        width: 30%;
+    }
+    & > div:nth-child(2) {
+        left: 30%;
+        width: 40%;
+    }
+    & > div:nth-child(3) {
+        left: 70%;
+        width: 30%;
+    }
+}
+
+.split-4-3-3 {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    margin: 1px 0px 1px 0px;
+    & > div:nth-child(1) {
+        left: 0px;
+        width: 40%;
+    }
+    & > div:nth-child(2) {
+        left: 40%;
+        width: 30%;
+    }
+    & > div:nth-child(3) {
+        left: 70%;
+        width: 30%;
+    }
+}
+
+.left-padding-1 {
+    padding-left: 1rem;
+}
+.left-padding-2 {
+    padding-left: 2rem;
+}
+
+/* ///////////////////////// */
+.header {
+    width: 100%;
+    height: 20%;
     display: flex;
     flex-direction: row;
     background: #555;
 }
-.header-button{
-    margin:10px;
-    padding:5px;
-    width:20rem;
-    height:3rem;
-    color:#333;
-    font-size:2rem;
+.header-button {
+    margin: 10px;
+    padding: 5px;
+    width: 20rem;
+    height: 3rem;
+    color: #333;
+    font-size: 2rem;
     background: #afa;
-    border:solid 3px #000;
-    text-align:center;
+    border: solid 3px #000;
+    text-align: center;
 }
-.body{
-    width:100%;
-    height:80%;
-    background:#333;
+.body {
+    width: 100%;
+    height: 80%;
+    background: #333;
     display: flex;
     flex-direction: row;
 }
-.right-canvas{
-    width:50%;
+.right-canvas {
+    width: 50%;
     background: #df0;
+    object-fit: contain;
 }
-.left-canvas{
-    width:50%;
+.left-canvas {
+    width: 50%;
     background: #d00;
+    object-fit: contain;
 }

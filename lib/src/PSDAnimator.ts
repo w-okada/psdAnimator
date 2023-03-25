@@ -145,8 +145,10 @@ export class PSDAnimator extends Processor {
                     }
 
                     const tmpCanvas = this.imageCache[drawingLayerPath]
-                    // @ts-ignore
-                    ctx.drawImage(tmpCanvas, drawingLayer.left * this.ratio, drawingLayer.top * this.ratio, tmpCanvas.width, tmpCanvas.height)
+                    if (tmpCanvas.width != 0 && tmpCanvas.height != 0) {
+                        // @ts-ignore
+                        ctx.drawImage(tmpCanvas, drawingLayer.left * this.ratio, drawingLayer.top * this.ratio, tmpCanvas.width, tmpCanvas.height)
+                    }
                 }
             }
             if (this.started) {
